@@ -6,37 +6,29 @@ var app     = express();
 
 app.get('/scrape', function(req, res){
 	// Let's scrape Anchorman 2
-	url = 'http://www.imdb.com/title/tt1661199/';
+	url = 'https://www.wikimedia.org/';
 
 	request(url, function(error, response, html){
 		if(!error){
 			var $ = cheerio.load(html);
 
-			var title, release, rating;
-			var json = { title : "", release : "", rating : ""};
+			var allImageElements = $.querySelectorAll('img');
 
-			$('.header').filter(function(){
-		        var data = $(this);
-		        title = data.children().first().text();
-		        release = data.children().last().children().text();
+		    wikiImages = [];
 
-		        json.title = title;
-		        json.release = release;
-	        })
+			for (i = 0; i < allImageElements.length; i++){
+		        wikiImages.push(allImageElements[i].src);
+		    }
 
-	        $('.star-box-giga-star').filter(function(){
-	        	var data = $(this);
-	        	rating = data.text();
+		    wikiImages = JSON.stringify(wikiImages, null, 4);
 
-	        	json.rating = rating;
-	        })
 		}
 
-		fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
+		fs.writeFile('output.json', wikiImages, function(err){
         	console.log('File successfully written! - Check your project directory for the output.json file');
         })
 
-        res.send('Check your console!')
+        res.send("Check the console :)")
 	})
 })
 
